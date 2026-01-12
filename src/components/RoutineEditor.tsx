@@ -9,21 +9,26 @@ interface RoutineEditorProps {
 }
 
 const RoutineEditor: React.FC<RoutineEditorProps> = ({ routine }) => {
-  const { stretches, updateStretches } = routine;
+  const {
+    name,
+    updateName,
+    stretches,
+    updateStretches,
+    duration,
+    updateDuration,
+  } = routine;
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
-  const [editDuration, setEditDuration] = useState(60);
 
   const startEditing = (stretch: Stretch) => {
     setEditingId(stretch.id);
     setEditName(stretch.name);
-    setEditDuration(stretch.duration);
   };
 
   const saveEdit = () => {
     if (!editingId) return;
     const newStretches = stretches.map((s) =>
-      s.id === editingId ? { ...s, name: editName, duration: editDuration } : s
+      s.id === editingId ? { ...s, name: editName } : s
     );
     updateStretches(newStretches);
     setEditingId(null);
@@ -38,7 +43,6 @@ const RoutineEditor: React.FC<RoutineEditorProps> = ({ routine }) => {
     const newStretch: Stretch = {
       id: crypto.randomUUID(),
       name: "New Stretch",
-      duration: 60,
     };
     updateStretches([...stretches, newStretch]);
   };
@@ -67,6 +71,30 @@ const RoutineEditor: React.FC<RoutineEditorProps> = ({ routine }) => {
         />
       </div>
 
+      <div className="space-y-4 mb-8">
+        <div className="bg-[var(--color-bg-layer)] border border-[var(--color-border-default)] rounded-2xl p-4 space-y-2">
+          <label className="block text-sm font-semibold">Routine Name</label>
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => updateName(e.target.value)}
+            className="w-full text-lg font-semibold bg-transparent p-2 rounded-lg outline-none border border-[var(--color-border-default)]"
+          />
+        </div>
+
+        <div className="bg-[var(--color-bg-layer)] border border-[var(--color-border-default)] rounded-2xl p-4 space-y-2">
+          <label className="block text-sm font-semibold">
+            Global Stretch Duration (seconds)
+          </label>
+          <input
+            type="number"
+            value={duration}
+            onChange={(e) => updateDuration(parseInt(e.target.value) || 0)}
+            className="w-full text-lg font-semibold bg-transparent p-2 rounded-lg outline-none border border-[var(--color-border-default)]"
+          />
+        </div>
+      </div>
+
       <div className="space-y-3">
         {stretches.map((stretch, index) => (
           <div
@@ -85,19 +113,6 @@ const RoutineEditor: React.FC<RoutineEditorProps> = ({ routine }) => {
                     onChange={(e) => setEditName(e.target.value)}
                     className="w-full text-lg font-semibold bg-transparent p-2 rounded-lg outline-none border border-[var(--color-border-default)]"
                     autoFocus
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="block text-sm font-semibold">
-                    Duration (seconds)
-                  </label>
-                  <input
-                    type="number"
-                    value={editDuration}
-                    onChange={(e) =>
-                      setEditDuration(parseInt(e.target.value) || 0)
-                    }
-                    className="w-full text-lg font-semibold bg-transparent p-2 rounded-lg outline-none border border-[var(--color-border-default)]"
                   />
                 </div>
                 <div className="flex justify-between gap-2 items-center">
@@ -141,9 +156,6 @@ const RoutineEditor: React.FC<RoutineEditorProps> = ({ routine }) => {
                 </div>
                 <div className="flex-1 min-w-0">
                   <h3 className="font-bold text-lg truncate">{stretch.name}</h3>
-                  <p className="text-[var(--color-fg-muted)] text-sm">
-                    {stretch.duration} seconds
-                  </p>
                 </div>
                 <div className="flex items-center gap-1">
                   <Button

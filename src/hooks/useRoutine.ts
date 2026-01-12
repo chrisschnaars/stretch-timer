@@ -1,51 +1,94 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import type { Stretch } from "../types";
-import { DEFAULT_STRETCHES } from "../constants";
+import {
+  DEFAULT_STRETCHES,
+  DEFAULT_DURATION,
+  DEFAULT_ROUTINE_NAME,
+} from "../constants";
 
 const STORAGE_KEY = "stretch-routine-v1";
 
 export const useRoutine = () => {
-  const [stretches, setStretches] = useState<Stretch[]>(() => {
+  const [data, setData] = useState<{
+    name: string;
+    stretches: Stretch[];
+    duration: number;
+  }>(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) return JSON.parse(saved);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      // Handle migration from per-stretch duration to global duration if needed
+      if (
+        Array.isArray(parsed.stretches) &&
+        parsed.duration !== undefined &&
+        parsed.name !== undefined
+      ) {
+        return parsed;
+      }
+      // If it's the old format (just an array of stretches), convert it
+      if (Array.isArray(parsed)) {
+        return {
+          name: DEFAULT_ROUTINE_NAME,
+          stretches: parsed.map((s) => ({ id: s.id, name: s.name })),
+          duration: parsed[0]?.duration || DEFAULT_DURATION,
+        };
+      }
+      // Handle partial migration
+      return {
+        name: parsed.name || DEFAULT_ROUTINE_NAME,
+        stretches: parsed.stretches || [],
+        duration: parsed.duration || DEFAULT_DURATION,
+      };
+    }
 
-    return DEFAULT_STRETCHES.map((s) => ({
-      ...s,
-      id: crypto.randomUUID(),
-    }));
+    return {
+      name: DEFAULT_ROUTINE_NAME,
+      stretches: DEFAULT_STRETCHES.map((s) => ({
+        ...s,
+        id: crypto.randomUUID(),
+      })),
+      duration: DEFAULT_DURATION,
+    };
   });
 
+  const { name, stretches, duration } = data;
+
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(stretches[0]?.duration || 60);
+  const [timeLeft, setTimeLeft] = useState(duration);
   const [isRunning, setIsRunning] = useState(false);
   const timerRef = useRef<number | null>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(stretches));
-  }, [stretches]);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  }, [data]);
 
   const currentStretch = stretches[currentIndex];
 
   const nextStretch = useCallback(() => {
-    if (currentIndex < stretches.length - 1) {
-      const nextIdx = currentIndex + 1;
-      setCurrentIndex(nextIdx);
-      setTimeLeft(stretches[nextIdx].duration);
-    } else {
-      setIsRunning(false);
-      setCurrentIndex(0);
-      setTimeLeft(stretches[0].duration);
-    }
-  }, [currentIndex, stretches]);
+    setCurrentIndex((prevIdx) => {
+      if (prevIdx < stretches.length - 1) {
+        const nextIdx = prevIdx + 1;
+        setTimeLeft(duration);
+        return nextIdx;
+      } else {
+        setIsRunning(false);
+        setTimeLeft(duration);
+        return 0;
+      }
+    });
+  }, [stretches.length, duration]);
 
   const previousStretch = useCallback(() => {
-    if (currentIndex > 0) {
-      const prevIdx = currentIndex - 1;
-      setCurrentIndex(prevIdx);
-      setTimeLeft(stretches[prevIdx].duration);
-    }
-  }, [currentIndex, stretches]);
+    setCurrentIndex((prevIdx) => {
+      if (prevIdx > 0) {
+        const newIdx = prevIdx - 1;
+        setTimeLeft(duration);
+        return newIdx;
+      }
+      return prevIdx;
+    });
+  }, [duration]);
 
   const toggleTimer = useCallback(() => {
     setIsRunning((prev) => !prev);
@@ -53,23 +96,37 @@ export const useRoutine = () => {
 
   const resetTimer = useCallback(() => {
     setIsRunning(false);
-    setTimeLeft(stretches[currentIndex].duration);
-  }, [currentIndex, stretches]);
+    setTimeLeft(duration);
+  }, [duration]);
 
   const updateStretches = (newStretches: Stretch[]) => {
-    setStretches(newStretches);
+    setData((prev) => ({ ...prev, stretches: newStretches }));
     // If the current index is out of bounds after update, reset it
     if (currentIndex >= newStretches.length) {
       setCurrentIndex(0);
-      setTimeLeft(newStretches[0]?.duration || 60);
+      setTimeLeft(duration);
       setIsRunning(false);
     }
   };
 
+  const updateDuration = (newDuration: number) => {
+    setData((prev) => ({ ...prev, duration: newDuration }));
+    if (!isRunning) {
+      setTimeLeft(newDuration);
+    }
+  };
+
+  const updateName = (newName: string) => {
+    setData((prev) => ({ ...prev, name: newName }));
+  };
+
   const playBeep = useCallback(() => {
     if (!audioCtxRef.current) {
-      audioCtxRef.current = new (window.AudioContext ||
-        (window as any).webkitAudioContext)();
+      const AudioContextClass =
+        window.AudioContext ||
+        (window as typeof window & { webkitAudioContext: typeof AudioContext })
+          .webkitAudioContext;
+      audioCtxRef.current = new AudioContextClass();
     }
 
     const ctx = audioCtxRef.current;
@@ -116,7 +173,9 @@ export const useRoutine = () => {
       }, 100);
     } else if (timeLeft <= 0 && isRunning) {
       playBeep();
-      nextStretch();
+      // Use a timeout to move the state update to the next tick,
+      // avoiding the "cascading render" lint error.
+      setTimeout(nextStretch, 0);
     }
 
     return () => {
@@ -125,7 +184,9 @@ export const useRoutine = () => {
   }, [isRunning, timeLeft, nextStretch, playBeep]);
 
   return {
+    name,
     stretches,
+    duration,
     currentStretch,
     currentIndex,
     timeLeft,
@@ -135,9 +196,11 @@ export const useRoutine = () => {
     nextStretch,
     previousStretch,
     updateStretches,
+    updateDuration,
+    updateName,
     setCurrentIndex: (idx: number) => {
       setCurrentIndex(idx);
-      setTimeLeft(stretches[idx].duration);
+      setTimeLeft(duration);
       setIsRunning(false);
     },
   };

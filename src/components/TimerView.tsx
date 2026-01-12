@@ -7,7 +7,8 @@ interface TimerViewProps {
 }
 
 const TimerView: React.FC<TimerViewProps> = ({ routine }) => {
-  const { currentStretch, timeLeft, currentIndex, stretches } = routine;
+  const { currentStretch, timeLeft, currentIndex, stretches, duration } =
+    routine;
 
   if (!currentStretch)
     return (
@@ -16,8 +17,7 @@ const TimerView: React.FC<TimerViewProps> = ({ routine }) => {
       </div>
     );
 
-  const totalTime = currentStretch.duration;
-  const progress = ((totalTime - timeLeft) / totalTime) * 100;
+  const progress = ((duration - timeLeft) / duration) * 100;
 
   return (
     <div className="flex flex-col items-center justify-center flex-1 w-full space-y-12 py-10">
