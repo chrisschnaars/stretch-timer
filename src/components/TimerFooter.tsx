@@ -9,13 +9,15 @@ const TimerFooter: React.FC<TimerFooterProps> = ({ routine }) => {
   const { currentIndex, stretches } = routine;
 
   return (
-    <footer className="w-full max-w-md mt-auto space-y-6 pb-4">
+    <footer className="w-full max-w-md mt-auto space-y-4 pb-4">
       <div className="flex justify-center gap-2">
         {stretches.map((_, index) => (
           <div
             key={index}
             className={`h-2 w-2 rounded-full transition-all duration-300 ${
-              index === currentIndex ? "bg-bg-accent" : "bg-bg-muted"
+              index === currentIndex
+                ? "bg-[var(--color-bg-accent)]"
+                : "bg-[var(--color-bg-muted)]"
             }`}
           />
         ))}
@@ -24,9 +26,9 @@ const TimerFooter: React.FC<TimerFooterProps> = ({ routine }) => {
       <div className="flex flex-col items-center">
         <div className="flex items-center">
           {currentIndex < stretches.length - 1 && (
-            <p className="text-fg-muted text-sm font-medium">
+            <p className="text-[var(--color-fg-muted)] text-sm font-medium">
               Next:{" "}
-              <span className="text-fg-primary font-bold">
+              <span className="text-[var(--color-fg-primary)] font-bold">
                 {stretches[currentIndex + 1].name}
               </span>
             </p>

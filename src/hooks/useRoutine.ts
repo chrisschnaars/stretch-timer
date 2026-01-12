@@ -1,8 +1,8 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
-import type { Stretch } from '../types';
-import { DEFAULT_STRETCHES } from '../constants';
+import { useState, useEffect, useCallback, useRef } from "react";
+import type { Stretch } from "../types";
+import { DEFAULT_STRETCHES } from "../constants";
 
-const STORAGE_KEY = 'stretch-routine-v1';
+const STORAGE_KEY = "stretch-routine-v1";
 
 export const useRoutine = () => {
   const [stretches, setStretches] = useState<Stretch[]>(() => {
@@ -72,25 +72,38 @@ export const useRoutine = () => {
         (window as any).webkitAudioContext)();
     }
 
-    const audioCtx = audioCtxRef.current;
+    const ctx = audioCtxRef.current;
 
-    if (audioCtx.state === "suspended") {
-      audioCtx.resume();
+    if (ctx.state === "suspended") {
+      ctx.resume();
     }
 
-    const oscillator = audioCtx.createOscillator();
-    const gainNode = audioCtx.createGain();
+    const now = ctx.currentTime;
 
-    oscillator.connect(gainNode);
-    gainNode.connect(audioCtx.destination);
+    // Create a gentle bell/chime with harmonics
+    const frequencies = [523.25, 659.25, 783.99]; // C5, E5, G5 - major chord
 
-    oscillator.type = "sine";
-    oscillator.frequency.setValueAtTime(880, audioCtx.currentTime); // A5
-    gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+    frequencies.forEach((freq, i) => {
+      const oscillator = ctx.createOscillator();
+      const gainNode = ctx.createGain();
 
-    oscillator.start();
-    oscillator.stop(audioCtx.currentTime + 0.5);
+      oscillator.type = "sine";
+      oscillator.frequency.setValueAtTime(freq, now);
+
+      // Stagger the notes slightly for a more musical effect
+      const startTime = now + i * 0.05;
+      const volume = 0.15 - i * 0.03; // Decreasing volume for each harmonic
+
+      gainNode.gain.setValueAtTime(0, startTime);
+      gainNode.gain.linearRampToValueAtTime(volume, startTime + 0.02);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, startTime + 1.2);
+
+      oscillator.connect(gainNode);
+      gainNode.connect(ctx.destination);
+
+      oscillator.start(startTime);
+      oscillator.stop(startTime + 1.5);
+    });
   }, []);
 
   useEffect(() => {
@@ -123,9 +136,9 @@ export const useRoutine = () => {
     previousStretch,
     updateStretches,
     setCurrentIndex: (idx: number) => {
-        setCurrentIndex(idx);
-        setTimeLeft(stretches[idx].duration);
-        setIsRunning(false);
-    }
+      setCurrentIndex(idx);
+      setTimeLeft(stretches[idx].duration);
+      setIsRunning(false);
+    },
   };
 };

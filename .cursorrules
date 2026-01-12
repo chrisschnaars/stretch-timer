@@ -1,0 +1,13 @@
+# Cursor Rules
+
+## Git Operations
+
+- NEVER automatically commit or push changes after making code updates unless explicitly requested by the user in the current message.
+- Always wait for user confirmation or a specific instruction before performing `git commit` or `git push`.
+
+## Tech Stack & Conventions
+
+- **React 19 & TypeScript**: Use functional components with `React.FC` or standard function declarations. Use hooks (`useState`, `useEffect`, `useCallback`, `useRef`) correctly.
+- **Tailwind CSS 4**: Use the `@theme` block in `index.css` for semantic variables. Use semantic classes like `bg-bg-primary`, `text-fg-primary`, `bg-bg-accent` instead of hardcoded neutral colors when applicable.
+- **PWA**: Keep in mind this is a Progressive Web App. Ensure assets and logic are offline-friendly.
+- **Component Structure**: Keep components small and focused. Prefer extracting logic into custom hooks if it becomes complex.
