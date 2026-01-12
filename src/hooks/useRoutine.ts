@@ -19,6 +19,7 @@ export const useRoutine = () => {
   const [timeLeft, setTimeLeft] = useState(stretches[0]?.duration || 60);
   const [isRunning, setIsRunning] = useState(false);
   const timerRef = useRef<number | null>(null);
+  const audioCtxRef = useRef<AudioContext | null>(null);
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(stretches));
@@ -66,14 +67,24 @@ export const useRoutine = () => {
   };
 
   const playBeep = useCallback(() => {
-    const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+    if (!audioCtxRef.current) {
+      audioCtxRef.current = new (window.AudioContext ||
+        (window as any).webkitAudioContext)();
+    }
+
+    const audioCtx = audioCtxRef.current;
+
+    if (audioCtx.state === "suspended") {
+      audioCtx.resume();
+    }
+
     const oscillator = audioCtx.createOscillator();
     const gainNode = audioCtx.createGain();
 
     oscillator.connect(gainNode);
     gainNode.connect(audioCtx.destination);
 
-    oscillator.type = 'sine';
+    oscillator.type = "sine";
     oscillator.frequency.setValueAtTime(880, audioCtx.currentTime); // A5
     gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
     gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
@@ -85,9 +96,12 @@ export const useRoutine = () => {
   useEffect(() => {
     if (isRunning && timeLeft > 0) {
       timerRef.current = window.setInterval(() => {
-        setTimeLeft((prev) => prev - 1);
-      }, 1000);
-    } else if (timeLeft === 0 && isRunning) {
+        setTimeLeft((prev) => {
+          const nextValue = prev - 0.1;
+          return nextValue > 0 ? nextValue : 0;
+        });
+      }, 100);
+    } else if (timeLeft <= 0 && isRunning) {
       playBeep();
       nextStretch();
     }
