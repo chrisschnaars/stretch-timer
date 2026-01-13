@@ -1,74 +1,43 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import type { Stretch } from "../types";
-import {
-  DEFAULT_STRETCHES,
-  DEFAULT_DURATION,
-  DEFAULT_REST_DURATION,
-  DEFAULT_ROUTINE_NAME,
-} from "../constants";
+import { useRoutines } from "./useRoutines";
 
-const STORAGE_KEY = "stretch-routine-v1";
-
-export const useRoutine = () => {
-  const [data, setData] = useState<{
-    name: string;
-    stretches: Stretch[];
-    duration: number;
-    restDuration: number;
-  }>(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      // Handle migration from per-stretch duration to global duration if needed
-      if (
-        Array.isArray(parsed.stretches) &&
-        parsed.duration !== undefined &&
-        parsed.name !== undefined &&
-        parsed.restDuration !== undefined
-      ) {
-        return parsed;
-      }
-      // If it's the old format (just an array of stretches), convert it
-      if (Array.isArray(parsed)) {
-        return {
-          name: DEFAULT_ROUTINE_NAME,
-          stretches: parsed.map((s) => ({ id: s.id, name: s.name })),
-          duration: parsed[0]?.duration || DEFAULT_DURATION,
-          restDuration: DEFAULT_REST_DURATION,
-        };
-      }
-      // Handle partial migration
-      return {
-        name: parsed.name || DEFAULT_ROUTINE_NAME,
-        stretches: parsed.stretches || [],
-        duration: parsed.duration || DEFAULT_DURATION,
-        restDuration: parsed.restDuration ?? DEFAULT_REST_DURATION,
-      };
-    }
-
-    return {
-      name: DEFAULT_ROUTINE_NAME,
-      stretches: DEFAULT_STRETCHES.map((s) => ({
-        ...s,
-        id: crypto.randomUUID(),
-      })),
-      duration: DEFAULT_DURATION,
-      restDuration: DEFAULT_REST_DURATION,
-    };
-  });
-
-  const { name, stretches, duration, restDuration } = data;
+export const useRoutine = (routineId: string) => {
+  const { getRoutine, updateRoutine: updateRoutineInStorage } = useRoutines();
+  const routine = getRoutine(routineId);
 
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(duration);
+  const [timeLeft, setTimeLeft] = useState(routine?.duration || 0);
   const [isRunning, setIsRunning] = useState(false);
   const [isResting, setIsResting] = useState(false);
   const timerRef = useRef<number | null>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
 
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-  }, [data]);
+  // If routine doesn't exist, return null values
+  if (!routine) {
+    return {
+      name: "",
+      stretches: [],
+      duration: 0,
+      restDuration: 0,
+      currentStretch: undefined,
+      currentIndex: 0,
+      timeLeft: 0,
+      isRunning: false,
+      isResting: false,
+      toggleTimer: () => {},
+      resetTimer: () => {},
+      nextStretch: () => {},
+      previousStretch: () => {},
+      updateStretches: () => {},
+      updateDuration: () => {},
+      updateRestDuration: () => {},
+      updateName: () => {},
+      setCurrentIndex: () => {},
+    };
+  }
+
+  const { name, stretches, duration, restDuration } = routine;
 
   const currentStretch = stretches[currentIndex];
 
@@ -133,7 +102,7 @@ export const useRoutine = () => {
   }, [duration]);
 
   const updateStretches = (newStretches: Stretch[]) => {
-    setData((prev) => ({ ...prev, stretches: newStretches }));
+    updateRoutineInStorage(routineId, { stretches: newStretches });
     // If the current index is out of bounds after update, reset it
     if (currentIndex >= newStretches.length) {
       setCurrentIndex(0);
@@ -144,21 +113,21 @@ export const useRoutine = () => {
   };
 
   const updateDuration = (newDuration: number) => {
-    setData((prev) => ({ ...prev, duration: newDuration }));
+    updateRoutineInStorage(routineId, { duration: newDuration });
     if (!isRunning && !isResting) {
       setTimeLeft(newDuration);
     }
   };
 
   const updateRestDuration = (newRestDuration: number) => {
-    setData((prev) => ({ ...prev, restDuration: newRestDuration }));
+    updateRoutineInStorage(routineId, { restDuration: newRestDuration });
     if (!isRunning && isResting) {
       setTimeLeft(newRestDuration);
     }
   };
 
   const updateName = (newName: string) => {
-    setData((prev) => ({ ...prev, name: newName }));
+    updateRoutineInStorage(routineId, { name: newName });
   };
 
   const playBeep = useCallback(() => {

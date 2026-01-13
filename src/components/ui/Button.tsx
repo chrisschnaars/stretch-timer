@@ -33,7 +33,7 @@ const Button: React.FC<ButtonProps> = ({
     "hover:text-red-600 hover:bg-red-500/10 dark:hover:text-red-400 dark:hover:bg-red-900/30";
 
   const sizeStyles = {
-    sm: children ? "px-4 h-8" : "size-8",
+    sm: children ? "px-4 h-8 text-sm" : "size-8",
     md: children ? "px-4 h-12" : "size-12",
     lg: circular ? "px-6 h-20" : "size-20",
   };

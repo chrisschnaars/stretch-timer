@@ -22,7 +22,7 @@ const SliderInput: React.FC<SliderInputProps> = ({
   formatValue = (v) => `${v}s`,
 }) => {
   return (
-    <div className={`space-y-4 w-full ${className}`}>
+    <div className={`space-y-2 w-full ${className}`}>
       <div className="flex justify-between items-center">
         {label && (
           <label className="block text-sm font-semibold">{label}</label>

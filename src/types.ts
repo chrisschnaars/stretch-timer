@@ -3,6 +3,14 @@ export interface Stretch {
   name: string;
 }
 
+export interface Routine {
+  id: string;
+  name: string;
+  stretches: Stretch[];
+  duration: number;
+  restDuration: number;
+}
+
 export interface RoutineState {
   name: string;
   stretches: Stretch[];
