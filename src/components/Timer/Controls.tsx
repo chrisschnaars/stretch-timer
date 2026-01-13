@@ -1,5 +1,5 @@
 import React from "react";
-import { Play, Pause, SkipBack, SkipForward } from "lucide-react";
+import { Play, Pause, RotateCcw, SkipForward } from "lucide-react";
 import { useRoutine } from "../../hooks/useRoutine";
 import Button from "../ui/Button";
 
@@ -11,11 +11,10 @@ const Controls: React.FC<ControlsProps> = ({ routine }) => {
   return (
     <div className="flex justify-between items-center gap-8">
       <Button
-        aria-label="Previous Stretch"
-        onClick={routine.previousStretch}
-        disabled={routine.currentIndex === 0}
+        aria-label="Restart Routine"
+        onClick={routine.resetTimer}
         circular
-        icon={SkipBack}
+        icon={RotateCcw}
       />
 
       <Button

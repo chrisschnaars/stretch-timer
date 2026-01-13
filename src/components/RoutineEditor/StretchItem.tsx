@@ -82,7 +82,12 @@ export const StretchItem: React.FC<StretchItemProps> = ({
             <GripVertical size={20} />
           </button>
           <div className="flex-1 min-w-0">
-            <h3 className="font-bold text-lg truncate">{stretch.name}</h3>
+            <button
+              className="font-bold text-lg truncate cursor-text"
+              onClick={() => startEditing?.(stretch)}
+            >
+              {stretch.name}
+            </button>
           </div>
           <div className="flex items-center gap-1">
             {!isOverlay && (
