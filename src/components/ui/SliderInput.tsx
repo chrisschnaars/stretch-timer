@@ -8,6 +8,7 @@ interface SliderInputProps {
   step?: number;
   onChange: (value: number) => void;
   className?: string;
+  formatValue?: (value: number) => string;
 }
 
 const SliderInput: React.FC<SliderInputProps> = ({
@@ -18,13 +19,16 @@ const SliderInput: React.FC<SliderInputProps> = ({
   step = 1,
   onChange,
   className = "",
+  formatValue = (v) => `${v}s`,
 }) => {
   return (
     <div className={`space-y-4 w-full ${className}`}>
       <div className="flex justify-between items-center">
-        {label && <label className="block text-sm font-semibold">{label}</label>}
-        <span className="text-lg font-bold text-[var(--color-bg-accent)]">
-          {value}s
+        {label && (
+          <label className="block text-sm font-semibold">{label}</label>
+        )}
+        <span className="text-md font-bold text-[var(--color-bg-accent)]">
+          {formatValue(value)}
         </span>
       </div>
       <input

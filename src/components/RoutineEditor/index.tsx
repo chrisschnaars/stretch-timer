@@ -37,6 +37,8 @@ const RoutineEditor: React.FC<RoutineEditorProps> = ({ routine }) => {
     updateStretches,
     duration,
     updateDuration,
+    restDuration,
+    updateRestDuration,
   } = routine;
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
@@ -134,11 +136,20 @@ const RoutineEditor: React.FC<RoutineEditorProps> = ({ routine }) => {
         />
 
         <SliderInput
-          label="Global Stretch Duration"
+          label="Active Duration"
           min={1}
           max={90}
           value={duration}
           onChange={updateDuration}
+        />
+
+        <SliderInput
+          label="Rest Duration"
+          min={0}
+          max={30}
+          value={restDuration}
+          onChange={updateRestDuration}
+          formatValue={(v) => (v === 0 ? "No rest" : `${v}s`)}
         />
       </div>
 

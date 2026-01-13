@@ -7,12 +7,12 @@ export const DEFAULT_STRETCHES: Omit<Stretch, "id">[] = [
   { name: "Trunk Twists" },
   { name: "Dead Arms" },
   { name: "Golf Swings" },
-  { name: "Swing Step Backs" },
+  { name: "Chops" },
   { name: "Marches" },
   { name: "Ballerina Squats" },
-  { name: "Chops" },
   { name: "Horse Stance" },
 ];
 
 export const DEFAULT_DURATION = 60;
-export const DEFAULT_ROUTINE_NAME = "My Routine";
+export const DEFAULT_REST_DURATION = 0;
+export const DEFAULT_ROUTINE_NAME = "Morning Stretch";

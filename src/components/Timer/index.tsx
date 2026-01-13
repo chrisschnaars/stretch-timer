@@ -7,8 +7,15 @@ interface TimerViewProps {
 }
 
 const TimerView: React.FC<TimerViewProps> = ({ routine }) => {
-  const { currentStretch, timeLeft, currentIndex, stretches, duration } =
-    routine;
+  const {
+    currentStretch,
+    timeLeft,
+    currentIndex,
+    stretches,
+    duration,
+    restDuration,
+    isResting,
+  } = routine;
 
   if (!currentStretch)
     return (
@@ -17,16 +24,20 @@ const TimerView: React.FC<TimerViewProps> = ({ routine }) => {
       </div>
     );
 
-  const progress = ((duration - timeLeft) / duration) * 100;
+  const currentDuration = isResting ? restDuration : duration;
+  const progress = ((currentDuration - timeLeft) / currentDuration) * 100;
+  const displayName = isResting ? "Rest" : currentStretch.name;
 
   return (
     <div className="flex flex-col items-center justify-center flex-1 w-full space-y-12 py-10">
       <div className="text-center space-y-2">
         <p className="text-[var(--color-fg-muted)] text-sm font-semibold uppercase tracking-widest">
-          {currentIndex + 1} of {stretches.length}
+          {isResting
+            ? "Rest Period"
+            : `${currentIndex + 1} of ${stretches.length}`}
         </p>
         <h2 className="text-4xl font-extrabold tracking-tight text-[var(--color-fg-primary)]">
-          {currentStretch.name}
+          {displayName}
         </h2>
       </div>
 

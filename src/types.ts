@@ -10,4 +10,5 @@ export interface RoutineState {
   isRunning: boolean;
   timeLeft: number;
   duration: number;
+  restDuration: number;
 }

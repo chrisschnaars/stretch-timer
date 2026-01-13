@@ -3,6 +3,7 @@ import type { Stretch } from "../types";
 import {
   DEFAULT_STRETCHES,
   DEFAULT_DURATION,
+  DEFAULT_REST_DURATION,
   DEFAULT_ROUTINE_NAME,
 } from "../constants";
 
@@ -13,6 +14,7 @@ export const useRoutine = () => {
     name: string;
     stretches: Stretch[];
     duration: number;
+    restDuration: number;
   }>(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
@@ -21,7 +23,8 @@ export const useRoutine = () => {
       if (
         Array.isArray(parsed.stretches) &&
         parsed.duration !== undefined &&
-        parsed.name !== undefined
+        parsed.name !== undefined &&
+        parsed.restDuration !== undefined
       ) {
         return parsed;
       }
@@ -31,6 +34,7 @@ export const useRoutine = () => {
           name: DEFAULT_ROUTINE_NAME,
           stretches: parsed.map((s) => ({ id: s.id, name: s.name })),
           duration: parsed[0]?.duration || DEFAULT_DURATION,
+          restDuration: DEFAULT_REST_DURATION,
         };
       }
       // Handle partial migration
@@ -38,6 +42,7 @@ export const useRoutine = () => {
         name: parsed.name || DEFAULT_ROUTINE_NAME,
         stretches: parsed.stretches || [],
         duration: parsed.duration || DEFAULT_DURATION,
+        restDuration: parsed.restDuration ?? DEFAULT_REST_DURATION,
       };
     }
 
@@ -48,14 +53,16 @@ export const useRoutine = () => {
         id: crypto.randomUUID(),
       })),
       duration: DEFAULT_DURATION,
+      restDuration: DEFAULT_REST_DURATION,
     };
   });
 
-  const { name, stretches, duration } = data;
+  const { name, stretches, duration, restDuration } = data;
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [timeLeft, setTimeLeft] = useState(duration);
   const [isRunning, setIsRunning] = useState(false);
+  const [isResting, setIsResting] = useState(false);
   const timerRef = useRef<number | null>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
 
@@ -66,29 +73,53 @@ export const useRoutine = () => {
   const currentStretch = stretches[currentIndex];
 
   const nextStretch = useCallback(() => {
-    setCurrentIndex((prevIdx) => {
-      if (prevIdx < stretches.length - 1) {
-        const nextIdx = prevIdx + 1;
+    if (isResting) {
+      // If we are resting, move to the next stretch
+      if (currentIndex < stretches.length - 1) {
+        setCurrentIndex((prev) => prev + 1);
+        setIsResting(false);
         setTimeLeft(duration);
-        return nextIdx;
       } else {
+        // End of routine
         setIsRunning(false);
+        setIsResting(false);
+        setCurrentIndex(0);
         setTimeLeft(duration);
-        return 0;
       }
-    });
-  }, [stretches.length, duration]);
+    } else {
+      // If we are not resting, check if we should rest
+      if (restDuration > 0) {
+        setIsResting(true);
+        setTimeLeft(restDuration);
+      } else if (currentIndex < stretches.length - 1) {
+        setCurrentIndex((prev) => prev + 1);
+        setTimeLeft(duration);
+      } else {
+        // End of routine (no rest)
+        setIsRunning(false);
+        setCurrentIndex(0);
+        setTimeLeft(duration);
+      }
+    }
+  }, [isResting, currentIndex, stretches.length, duration, restDuration]);
 
   const previousStretch = useCallback(() => {
-    setCurrentIndex((prevIdx) => {
-      if (prevIdx > 0) {
-        const newIdx = prevIdx - 1;
+    if (isResting) {
+      // If resting, go back to the current stretch
+      setIsResting(false);
+      setTimeLeft(duration);
+    } else if (currentIndex > 0) {
+      // If not resting and not at the beginning, go back to previous rest or stretch
+      if (restDuration > 0) {
+        setCurrentIndex((prev) => prev - 1);
+        setIsResting(true);
+        setTimeLeft(restDuration);
+      } else {
+        setCurrentIndex((prev) => prev - 1);
         setTimeLeft(duration);
-        return newIdx;
       }
-      return prevIdx;
-    });
-  }, [duration]);
+    }
+  }, [isResting, currentIndex, duration, restDuration]);
 
   const toggleTimer = useCallback(() => {
     setIsRunning((prev) => !prev);
@@ -96,6 +127,8 @@ export const useRoutine = () => {
 
   const resetTimer = useCallback(() => {
     setIsRunning(false);
+    setIsResting(false);
+    setCurrentIndex(0);
     setTimeLeft(duration);
   }, [duration]);
 
@@ -104,6 +137,7 @@ export const useRoutine = () => {
     // If the current index is out of bounds after update, reset it
     if (currentIndex >= newStretches.length) {
       setCurrentIndex(0);
+      setIsResting(false);
       setTimeLeft(duration);
       setIsRunning(false);
     }
@@ -111,8 +145,15 @@ export const useRoutine = () => {
 
   const updateDuration = (newDuration: number) => {
     setData((prev) => ({ ...prev, duration: newDuration }));
-    if (!isRunning) {
+    if (!isRunning && !isResting) {
       setTimeLeft(newDuration);
+    }
+  };
+
+  const updateRestDuration = (newRestDuration: number) => {
+    setData((prev) => ({ ...prev, restDuration: newRestDuration }));
+    if (!isRunning && isResting) {
+      setTimeLeft(newRestDuration);
     }
   };
 
@@ -187,19 +228,23 @@ export const useRoutine = () => {
     name,
     stretches,
     duration,
+    restDuration,
     currentStretch,
     currentIndex,
     timeLeft,
     isRunning,
+    isResting,
     toggleTimer,
     resetTimer,
     nextStretch,
     previousStretch,
     updateStretches,
     updateDuration,
+    updateRestDuration,
     updateName,
     setCurrentIndex: (idx: number) => {
       setCurrentIndex(idx);
+      setIsResting(false);
       setTimeLeft(duration);
       setIsRunning(false);
     },
