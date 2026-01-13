@@ -3,6 +3,8 @@ import { useRoutine } from "../../hooks/useRoutine";
 import { Plus } from "lucide-react";
 import type { Stretch } from "../../types";
 import Button from "../ui/Button";
+import TextInput from "../ui/TextInput";
+import SliderInput from "../ui/SliderInput";
 import {
   DndContext,
   closestCenter,
@@ -125,27 +127,19 @@ const RoutineEditor: React.FC<RoutineEditorProps> = ({ routine }) => {
       </div>
 
       <div className="space-y-6 mb-8">
-        <div className="space-y-2">
-          <label className="block text-sm font-semibold">Routine Name</label>
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => updateName(e.target.value)}
-            className="w-full text-lg font-semibold bg-[var(--color-bg-layer)] p-2 rounded-lg outline-none border border-[var(--color-border-default)]"
-          />
-        </div>
+        <TextInput
+          label="Routine Name"
+          value={name}
+          onChange={(e) => updateName(e.target.value)}
+        />
 
-        <div className="space-y-2">
-          <label className="block text-sm font-semibold">
-            Global Stretch Duration (seconds)
-          </label>
-          <input
-            type="number"
-            value={duration}
-            onChange={(e) => updateDuration(parseInt(e.target.value) || 0)}
-            className="w-full text-lg font-semibold bg-[var(--color-bg-layer)] p-2 rounded-lg outline-none border border-[var(--color-border-default)]"
-          />
-        </div>
+        <SliderInput
+          label="Global Stretch Duration"
+          min={1}
+          max={90}
+          value={duration}
+          onChange={updateDuration}
+        />
       </div>
 
       {stretches.length === 0 ? (

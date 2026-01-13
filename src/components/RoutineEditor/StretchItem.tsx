@@ -2,6 +2,7 @@ import React from "react";
 import { Trash2, GripVertical, Pencil } from "lucide-react";
 import type { Stretch } from "../../types";
 import Button from "../ui/Button";
+import TextInput from "../ui/TextInput";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
@@ -42,16 +43,13 @@ export const StretchItem: React.FC<StretchItemProps> = ({
     >
       {editingId === stretch.id ? (
         <div className="space-y-6">
-          <div className="space-y-1">
-            <label className="block text-sm font-semibold">Name</label>
-            <input
-              type="text"
-              value={editName}
-              onChange={(e) => setEditName?.(e.target.value)}
-              className="w-full text-lg font-semibold bg-transparent p-2 rounded-lg outline-none border border-[var(--color-border-default)]"
-              autoFocus
-            />
-          </div>
+          <TextInput
+            label="Name"
+            value={editName}
+            onChange={(e) => setEditName?.(e.target.value)}
+            className="bg-transparent"
+            autoFocus
+          />
           <div className="flex justify-between gap-2 items-center">
             <div className="flex justify-end gap-2 pt-2">
               <Button
