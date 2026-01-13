@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import type { Routine, Stretch } from "../types";
+import type { Routine } from "../types";
 import {
   DEFAULT_STRETCHES,
   DEFAULT_DURATION,
@@ -24,8 +24,11 @@ const migrateFromOldFormat = (): Routine[] => {
       stretches: Array.isArray(parsed.stretches)
         ? parsed.stretches
         : Array.isArray(parsed)
-          ? parsed.map((s: { id: string; name: string }) => ({ id: s.id, name: s.name }))
-          : DEFAULT_STRETCHES.map((s) => ({ ...s, id: crypto.randomUUID() })),
+        ? parsed.map((s: { id: string; name: string }) => ({
+            id: s.id,
+            name: s.name,
+          }))
+        : DEFAULT_STRETCHES.map((s) => ({ ...s, id: crypto.randomUUID() })),
       duration: parsed.duration || DEFAULT_DURATION,
       restDuration: parsed.restDuration ?? DEFAULT_REST_DURATION,
     };
@@ -83,11 +86,14 @@ export const useRoutines = () => {
     return newRoutine;
   }, []);
 
-  const updateRoutine = useCallback((id: string, updates: Partial<Omit<Routine, "id">>) => {
-    setRoutines((prev) =>
-      prev.map((r) => (r.id === id ? { ...r, ...updates } : r))
-    );
-  }, []);
+  const updateRoutine = useCallback(
+    (id: string, updates: Partial<Omit<Routine, "id">>) => {
+      setRoutines((prev) =>
+        prev.map((r) => (r.id === id ? { ...r, ...updates } : r))
+      );
+    },
+    []
+  );
 
   const deleteRoutine = useCallback((id: string) => {
     setRoutines((prev) => prev.filter((r) => r.id !== id));
