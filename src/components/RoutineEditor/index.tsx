@@ -134,7 +134,7 @@ const RoutineEditor: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[var(--color-bg-primary)] text-[var(--color-fg-primary)] font-sans p-4 flex flex-col items-center">
-      <header className="w-full max-w-md flex justify-between items-center mb-12 pt-2">
+      <header className="w-full max-w-md flex justify-between items-center mb-8 pt-2">
         <Button
           onClick={() => navigate(-1)}
           icon={ArrowLeft}
@@ -174,29 +174,26 @@ const RoutineEditor: React.FC = () => {
           </div>
         </div>
 
-        {stretches.length === 0 ? (
-          <div className="text-center py-20 bg-[var(--color-bg-layer)] border border-dashed rounded-3xl border-[var(--color-border-default)]">
-            <p className="text-[var(--color-fg-muted)]">
-              Your routine is empty.
-            </p>
-            <button
+        <div className="space-y-2">
+          <div className="flex justify-between items-center">
+            <h2 className="text-lg font-semibold">Routine</h2>
+            <Button
               onClick={addStretch}
-              className="mt-4 text-[var(--color-fg-primary)] font-bold underline"
-            >
-              Add your first stretch
-            </button>
+              icon={Plus}
+              size="sm"
+              aria-label="Add Stretch"
+            />
           </div>
-        ) : (
-          <div className="space-y-2">
-            <div className="flex justify-between items-center">
-              <h2 className="text-lg font-semibold">Routine</h2>
-              <Button
-                onClick={addStretch}
-                icon={Plus}
-                size="sm"
-                aria-label="Add Stretch"
-              />
+          {stretches.length === 0 ? (
+            <div className="text-center py-12 bg-[var(--color-bg-layer)] border border-dashed rounded-3xl border-[var(--color-border-default)]">
+              <p className="text-[var(--color-fg-muted)] mb-4">
+                Your routine is empty.
+              </p>
+              <Button onClick={addStretch} kind="primary">
+                Add your first stretch
+              </Button>
             </div>
+          ) : (
             <DndContext
               sensors={sensors}
               collisionDetection={closestCenter}
@@ -231,8 +228,8 @@ const RoutineEditor: React.FC = () => {
                 ) : null}
               </DragOverlay>
             </DndContext>
-          </div>
-        )}
+          )}
+        </div>
 
         <div>
           <h2 className="text-lg font-semibold mb-4">Feeling unmotivated?</h2>

@@ -28,7 +28,7 @@ const RoutineList: React.FC = () => {
   return (
     <div className="min-h-screen bg-[var(--color-bg-primary)] text-[var(--color-fg-primary)] font-sans p-4 flex flex-col items-center">
       <div className="w-full max-w-md">
-        <header className="flex justify-between items-center mb-12 pt-2">
+        <header className="flex justify-between items-center mb-8 pt-2">
           <h1 className="text-2xl font-bold tracking-tight">STRETCH</h1>
           <Button
             onClick={handleAddRoutine}
