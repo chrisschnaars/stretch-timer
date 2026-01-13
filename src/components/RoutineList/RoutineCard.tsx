@@ -48,7 +48,7 @@ const RoutineCard: React.FC<RoutineCardProps> = ({ routine }) => {
             onClick={handleEdit}
             icon={SquarePen}
             size="sm"
-            className="opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity"
+            className="md:opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity"
             aria-label="Edit routine"
           />
         </div>
