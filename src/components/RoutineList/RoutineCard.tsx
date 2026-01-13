@@ -27,11 +27,11 @@ const RoutineCard: React.FC<RoutineCardProps> = ({ routine }) => {
   const seconds = totalWithRest % 60;
 
   return (
-    <div className="relative bg-[var(--color-bg-layer)] border border-[var(--color-border-default)] rounded-2xl p-6 cursor-pointer hover:shadow-sm transition-all group">
+    <div className="relative bg-[var(--color-bg-layer)] border border-[var(--color-border-default)] rounded-2xl p-6 hover:shadow-sm transition-all group">
       <button
-        className="absolute inset-0 rounded-2xl"
+        className="absolute inset-0 rounded-2xl hover:cursor-pointer"
         onClick={handleCardClick}
-      ></button>
+      />
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1 min-w-0">
           <h2 className="text-xl font-bold mb-1 truncate">{routine.name}</h2>

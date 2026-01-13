@@ -82,7 +82,16 @@ const RoutineEditor: React.FC = () => {
       s.id === editingId ? { ...s, name: editName.trim() } : s
     );
     updateStretches(newStretches);
-    setEditingId(null);
+
+    // Create a new stretch and set it to editing mode
+    const newId = crypto.randomUUID();
+    const newStretch: Stretch = {
+      id: newId,
+      name: "",
+    };
+    updateStretches([...newStretches, newStretch]);
+    setEditingId(newId);
+    setEditName("");
   };
 
   const cancelEdit = () => {
