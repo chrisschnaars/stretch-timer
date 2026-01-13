@@ -1,11 +1,11 @@
 import React from "react";
-import { useRoutine } from "../hooks/useRoutine";
+import { useRoutine } from "../../hooks/useRoutine";
 
-interface TimerFooterProps {
+interface FooterProps {
   routine: ReturnType<typeof useRoutine>;
 }
 
-const TimerFooter: React.FC<TimerFooterProps> = ({ routine }) => {
+const Footer: React.FC<FooterProps> = ({ routine }) => {
   const { currentIndex, stretches } = routine;
 
   return (
@@ -39,4 +39,4 @@ const TimerFooter: React.FC<TimerFooterProps> = ({ routine }) => {
   );
 };
 
-export default TimerFooter;
+export default Footer;

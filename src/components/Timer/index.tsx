@@ -1,6 +1,6 @@
 import React from "react";
-import { useRoutine } from "../hooks/useRoutine";
-import TimerControls from "./TimerControls";
+import { useRoutine } from "../../hooks/useRoutine";
+import Controls from "./Controls";
 
 interface TimerViewProps {
   routine: ReturnType<typeof useRoutine>;
@@ -62,7 +62,7 @@ const TimerView: React.FC<TimerViewProps> = ({ routine }) => {
         </div>
       </div>
 
-      <TimerControls routine={routine} />
+      <Controls routine={routine} />
     </div>
   );
 };

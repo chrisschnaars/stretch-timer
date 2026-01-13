@@ -1,13 +1,13 @@
 import React from "react";
 import { Play, Pause, SkipBack, SkipForward } from "lucide-react";
-import { useRoutine } from "../hooks/useRoutine";
-import Button from "./ui/Button";
+import { useRoutine } from "../../hooks/useRoutine";
+import Button from "../ui/Button";
 
-interface TimerControlsProps {
+interface ControlsProps {
   routine: ReturnType<typeof useRoutine>;
 }
 
-const TimerControls: React.FC<TimerControlsProps> = ({ routine }) => {
+const Controls: React.FC<ControlsProps> = ({ routine }) => {
   return (
     <div className="flex justify-between items-center gap-8">
       <Button
@@ -37,4 +37,4 @@ const TimerControls: React.FC<TimerControlsProps> = ({ routine }) => {
   );
 };
 
-export default TimerControls;
+export default Controls;

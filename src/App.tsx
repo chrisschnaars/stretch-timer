@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useRoutine } from "./hooks/useRoutine";
-import TimerView from "./components/TimerView";
+import TimerView from "./components/Timer";
 import RoutineEditor from "./components/RoutineEditor";
-import TimerFooter from "./components/TimerFooter";
+import Footer from "./components/Timer/Footer";
 import { X, List } from "lucide-react";
 import Button from "./components/ui/Button";
 
@@ -30,7 +30,7 @@ function App() {
         )}
       </main>
 
-      {view === "timer" && <TimerFooter routine={routine} />}
+      {view === "timer" && <Footer routine={routine} />}
     </div>
   );
 }
