@@ -15,4 +15,4 @@ export const DEFAULT_STRETCHES: Omit<Stretch, "id">[] = [
 
 export const DEFAULT_DURATION = 60;
 export const DEFAULT_REST_DURATION = 0;
-export const DEFAULT_ROUTINE_NAME = "Morning Stretch";
+export const DEFAULT_ROUTINE_NAME = "Morning Stretches";

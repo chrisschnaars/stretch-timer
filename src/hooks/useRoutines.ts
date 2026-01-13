@@ -62,8 +62,19 @@ export const useRoutines = () => {
       return migrated;
     }
 
-    // Return empty array for empty state
-    return [];
+    // Create default routine with default stretches
+    const defaultRoutine: Routine = {
+      id: crypto.randomUUID(),
+      name: DEFAULT_ROUTINE_NAME,
+      stretches: DEFAULT_STRETCHES.map((s) => ({
+        ...s,
+        id: crypto.randomUUID(),
+      })),
+      duration: DEFAULT_DURATION,
+      restDuration: DEFAULT_REST_DURATION,
+    };
+
+    return [defaultRoutine];
   });
 
   useEffect(() => {
