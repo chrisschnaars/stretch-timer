@@ -28,7 +28,7 @@ const Controls: React.FC<ControlsProps> = ({ routine }) => {
 
       <Button
         aria-label="Next Stretch"
-        onClick={routine.nextStretch}
+        onClick={routine.skipToNext}
         circular
         icon={SkipForward}
       />

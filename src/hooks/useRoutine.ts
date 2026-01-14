@@ -29,6 +29,7 @@ export const useRoutine = (routineId: string) => {
       resetTimer: () => {},
       nextStretch: () => {},
       previousStretch: () => {},
+      skipToNext: () => {},
       updateStretches: () => {},
       updateDuration: () => {},
       updateRestDuration: () => {},
@@ -56,15 +57,15 @@ export const useRoutine = (routineId: string) => {
         setTimeLeft(duration);
       }
     } else {
-      // If we are not resting, check if we should rest
-      if (restDuration > 0) {
+      // If we are not resting, check if we should rest (but not after the last stretch)
+      if (restDuration > 0 && currentIndex < stretches.length - 1) {
         setIsResting(true);
         setTimeLeft(restDuration);
       } else if (currentIndex < stretches.length - 1) {
         setCurrentIndex((prev) => prev + 1);
         setTimeLeft(duration);
       } else {
-        // End of routine (no rest)
+        // End of routine (no rest after final stretch)
         setIsRunning(false);
         setCurrentIndex(0);
         setTimeLeft(duration);
@@ -89,6 +90,21 @@ export const useRoutine = (routineId: string) => {
       }
     }
   }, [isResting, currentIndex, duration, restDuration]);
+
+  const skipToNext = useCallback(() => {
+    // Skip directly to the next stretch, bypassing rest periods
+    if (currentIndex < stretches.length - 1) {
+      setCurrentIndex((prev) => prev + 1);
+      setIsResting(false);
+      setTimeLeft(duration);
+    } else {
+      // End of routine
+      setIsRunning(false);
+      setIsResting(false);
+      setCurrentIndex(0);
+      setTimeLeft(duration);
+    }
+  }, [currentIndex, stretches.length, duration]);
 
   const toggleTimer = useCallback(() => {
     setIsRunning((prev) => !prev);
@@ -207,6 +223,7 @@ export const useRoutine = (routineId: string) => {
     resetTimer,
     nextStretch,
     previousStretch,
+    skipToNext,
     updateStretches,
     updateDuration,
     updateRestDuration,
