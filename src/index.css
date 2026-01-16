@@ -35,3 +35,15 @@
     transform: translateY(0);
   }
 }
+
+.subheading {
+  @apply text-[var(--color-fg-muted)] text-sm font-semibold uppercase tracking-widest;
+}
+
+.heading-lg {
+  @apply text-4xl font-bold tracking-tight text-[var(--color-fg-primary)];
+}
+
+.heading-md {
+  @apply text-xl font-semibold text-[var(--color-fg-primary)];
+}

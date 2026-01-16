@@ -156,7 +156,7 @@ const RoutineEditor: React.FC = () => {
 
       <div className="w-full max-w-md flex flex-col gap-8">
         <div>
-          <h2 className="text-lg font-semibold mb-4">Routine Info</h2>
+          <h2 className="heading-md mb-4">Routine Info</h2>
           <div className="bg-[var(--color-bg-layer)] border border-[var(--color-border-default)] rounded-2xl p-6 space-y-6">
             <TextInput
               label="Routine Name"
@@ -185,7 +185,7 @@ const RoutineEditor: React.FC = () => {
 
         <div className="space-y-2">
           <div className="flex justify-between items-center">
-            <h2 className="text-lg font-semibold">Routine</h2>
+            <h2 className="heading-md">Routine</h2>
             <Button
               onClick={addStretch}
               icon={Plus}
@@ -241,7 +241,7 @@ const RoutineEditor: React.FC = () => {
         </div>
 
         <div>
-          <h2 className="text-lg font-semibold mb-4">Feeling unmotivated?</h2>
+          <h2 className="heading-md mb-4">Feeling unmotivated?</h2>
           <Button
             className="w-full border-1 border-[var(--color-border-default)]"
             onClick={handleDelete}

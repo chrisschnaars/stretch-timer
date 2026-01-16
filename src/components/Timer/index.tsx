@@ -4,6 +4,7 @@ import { Menu, SquarePen } from "lucide-react";
 import { useRoutine } from "../../hooks/useRoutine";
 import Controls from "./Controls";
 import Footer from "./Footer";
+import Timer from "./Timer";
 import Button from "../ui/Button";
 
 const TimerView: React.FC = () => {
@@ -57,12 +58,8 @@ const TimerView: React.FC = () => {
         {isFinished ? (
           <>
             <div className="text-center space-y-2 animate-[fadeIn_0.3s_ease-in]">
-              <p className="text-[var(--color-fg-muted)] text-sm font-semibold uppercase tracking-widest">
-                {routine.name}
-              </p>
-              <h2 className="text-4xl font-extrabold tracking-tight text-[var(--color-fg-primary)]">
-                Finished!
-              </h2>
+              <p className="subheading">{routine.name}</p>
+              <h2 className="heading-lg">Finished!</h2>
             </div>
 
             <div className="flex flex-col gap-4 w-full max-w-xs animate-[fadeIn_0.5s_ease-in_0.2s_both]">
@@ -87,47 +84,15 @@ const TimerView: React.FC = () => {
         ) : (
           <>
             <div className="text-center space-y-2">
-              <p className="text-[var(--color-fg-muted)] text-sm font-semibold uppercase tracking-widest">
+              <p className="subheading">
                 {isResting
                   ? "Rest Period"
                   : `${currentIndex + 1} of ${stretches.length}`}
               </p>
-              <h2 className="text-4xl font-extrabold tracking-tight text-[var(--color-fg-primary)]">
-                {displayName}
-              </h2>
+              <h2 className="heading-lg">{displayName}</h2>
             </div>
 
-            <div className="relative flex items-center justify-center">
-              {/* Large circular progress representation */}
-              <div className="relative w-72 h-72 flex items-center justify-center">
-                <svg className="absolute w-full h-full transform -rotate-90">
-                  <circle
-                    cx="144"
-                    cy="144"
-                    r="130"
-                    stroke="currentColor"
-                    strokeWidth="12"
-                    fill="transparent"
-                    className="text-[var(--color-bg-muted)]"
-                  />
-                  <circle
-                    cx="144"
-                    cy="144"
-                    r="130"
-                    stroke="currentColor"
-                    strokeWidth="12"
-                    fill="transparent"
-                    strokeDasharray={2 * Math.PI * 130}
-                    strokeDashoffset={2 * Math.PI * 130 * (1 - progress / 100)}
-                    strokeLinecap="round"
-                    className="text-[var(--color-bg-accent)] transition-all duration-100 ease-linear"
-                  />
-                </svg>
-                <div className="text-[var(--color-fg-primary)] text-8xl font-black tabular-nums tracking-tighter">
-                  {Math.ceil(timeLeft)}
-                </div>
-              </div>
-            </div>
+            <Timer timeLeft={timeLeft} progress={progress} />
 
             <Controls routine={routine} />
           </>

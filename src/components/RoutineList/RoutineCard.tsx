@@ -34,7 +34,7 @@ const RoutineCard: React.FC<RoutineCardProps> = ({ routine }) => {
       />
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1 min-w-0">
-          <h2 className="text-xl font-bold mb-1 truncate">{routine.name}</h2>
+          <h2 className="heading-md mb-1/2 truncate">{routine.name}</h2>
           <div className="flex items-center gap-2 text-md text-[var(--color-fg-muted)]">
             <p>{routine.stretches.length} stretches</p>
             <span>•</span>
