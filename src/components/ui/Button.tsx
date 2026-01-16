@@ -30,7 +30,7 @@ const Button: React.FC<ButtonProps> = ({
   };
 
   const destructiveStyles =
-    "hover:text-red-600 hover:bg-red-500/10 dark:hover:text-red-400 dark:hover:bg-red-900/30";
+    "text-red-500 dark:text-red-300 hover:text-red-500 dark:hover:text-red-300 hover:bg-red-500/10 dark:hover:bg-red-900/30";
 
   const sizeStyles = {
     sm: children ? "px-4 h-8 text-sm" : "size-8",

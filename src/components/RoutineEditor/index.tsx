@@ -245,7 +245,7 @@ const RoutineEditor: React.FC = () => {
         <div>
           <h2 className="heading-md mb-4">Feeling unmotivated?</h2>
           <Button
-            className="w-full border-1 border-[var(--color-border-default)]"
+            className="w-full border-1 border-red-300"
             onClick={handleDelete}
             icon={Trash2}
             size="md"

@@ -23,11 +23,17 @@ const RoutineCard: React.FC<RoutineCardProps> = ({ routine }) => {
   const totalDuration = routine.stretches.length * routine.duration;
   const totalWithRest =
     totalDuration + (routine.stretches.length - 1) * routine.restDuration;
-  const minutes = Math.floor(totalWithRest / 60);
-  const seconds = totalWithRest % 60;
+
+  const formatDuration = (totalSeconds: number) => {
+    if (totalSeconds < 60) {
+      return "less than a minute";
+    }
+    const roundedMinutes = Math.round(totalSeconds / 60);
+    return `${roundedMinutes} ${roundedMinutes === 1 ? "min" : "mins"}`;
+  };
 
   return (
-    <div className="relative bg-[var(--color-bg-layer)] border border-[var(--color-border-default)] rounded-2xl p-6 hover:shadow-sm transition-all group">
+    <div className="relative bg-[var(--color-bg-layer)] border border-[var(--color-border-default)] rounded-2xl p-5 hover:shadow-sm transition-all group">
       <button
         className="absolute inset-0 rounded-2xl hover:cursor-pointer"
         onClick={handleCardClick}
@@ -41,9 +47,7 @@ const RoutineCard: React.FC<RoutineCardProps> = ({ routine }) => {
               {routine.stretches.length === 1 ? "" : "es"}
             </p>
             <span>•</span>
-            <p>
-              {minutes}:{seconds.toString().padStart(2, "0")}
-            </p>
+            <p>{formatDuration(totalWithRest)}</p>
           </div>
         </div>
         <div className="flex items-center gap-1">
