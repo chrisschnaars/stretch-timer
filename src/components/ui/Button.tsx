@@ -20,7 +20,7 @@ const Button: React.FC<ButtonProps> = ({
   ...props
 }) => {
   const baseStyles =
-    "inline-flex items-center justify-center gap-1 transition-all active:scale-95 disabled:opacity-50 disabled:pointer-events-none";
+    "inline-flex items-center justify-center gap-1 transition-all active:scale-95 disabled:opacity-50 disabled:pointer-events-none tracking-wide";
 
   const kindStyles = {
     default:
@@ -34,8 +34,8 @@ const Button: React.FC<ButtonProps> = ({
 
   const sizeStyles = {
     sm: children ? "px-4 h-8 text-sm" : "size-8",
-    md: children ? "px-4 h-12" : "size-12",
-    lg: circular ? "px-6 h-20" : "size-20",
+    md: children ? "px-4 h-12 text-base" : "size-12",
+    lg: children ? "px-6 h-20 text-lg" : "size-20",
   };
 
   const shapeStyles = circular ? "rounded-full" : "rounded-lg";

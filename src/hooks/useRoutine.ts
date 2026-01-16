@@ -10,6 +10,7 @@ export const useRoutine = (routineId: string) => {
   const [timeLeft, setTimeLeft] = useState(routine?.duration || 0);
   const [isRunning, setIsRunning] = useState(false);
   const [isResting, setIsResting] = useState(false);
+  const [isFinished, setIsFinished] = useState(false);
   const timerRef = useRef<number | null>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
 
@@ -25,6 +26,7 @@ export const useRoutine = (routineId: string) => {
       timeLeft: 0,
       isRunning: false,
       isResting: false,
+      isFinished: false,
       toggleTimer: () => {},
       resetTimer: () => {},
       nextStretch: () => {},
@@ -53,8 +55,7 @@ export const useRoutine = (routineId: string) => {
         // End of routine
         setIsRunning(false);
         setIsResting(false);
-        setCurrentIndex(0);
-        setTimeLeft(duration);
+        setIsFinished(true);
       }
     } else {
       // If we are not resting, check if we should rest (but not after the last stretch)
@@ -67,8 +68,7 @@ export const useRoutine = (routineId: string) => {
       } else {
         // End of routine (no rest after final stretch)
         setIsRunning(false);
-        setCurrentIndex(0);
-        setTimeLeft(duration);
+        setIsFinished(true);
       }
     }
   }, [isResting, currentIndex, stretches.length, duration, restDuration]);
@@ -113,6 +113,7 @@ export const useRoutine = (routineId: string) => {
   const resetTimer = useCallback(() => {
     setIsRunning(false);
     setIsResting(false);
+    setIsFinished(false);
     setCurrentIndex(0);
     setTimeLeft(duration);
   }, [duration]);
@@ -219,6 +220,7 @@ export const useRoutine = (routineId: string) => {
     timeLeft,
     isRunning,
     isResting,
+    isFinished,
     toggleTimer,
     resetTimer,
     nextStretch,
@@ -231,6 +233,7 @@ export const useRoutine = (routineId: string) => {
     setCurrentIndex: (idx: number) => {
       setCurrentIndex(idx);
       setIsResting(false);
+      setIsFinished(false);
       setTimeLeft(duration);
       setIsRunning(false);
     },
