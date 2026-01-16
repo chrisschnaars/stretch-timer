@@ -36,7 +36,10 @@ const RoutineCard: React.FC<RoutineCardProps> = ({ routine }) => {
         <div className="flex-1 min-w-0">
           <h2 className="heading-md mb-1/2 truncate">{routine.name}</h2>
           <div className="flex items-center gap-2 text-md text-[var(--color-fg-muted)]">
-            <p>{routine.stretches.length} stretches</p>
+            <p>
+              {routine.stretches.length} stretch
+              {routine.stretches.length === 1 ? "" : "es"}
+            </p>
             <span>•</span>
             <p>
               {minutes}:{seconds.toString().padStart(2, "0")}

@@ -97,7 +97,8 @@ const RoutineEditor: React.FC = () => {
   const cancelEdit = () => {
     if (editingId) {
       const stretch = stretches.find((s) => s.id === editingId);
-      if (stretch && !stretch.name.trim()) {
+      // Only remove empty stretches if there's more than one stretch
+      if (stretch && !stretch.name.trim() && stretches.length > 1) {
         removeStretch(editingId);
       }
     }
@@ -227,6 +228,7 @@ const RoutineEditor: React.FC = () => {
                       cancelEdit={cancelEdit}
                       removeStretch={removeStretch}
                       startEditing={startEditing}
+                      isOnlyStretch={stretches.length === 1}
                     />
                   ))}
                 </div>
