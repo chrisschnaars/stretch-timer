@@ -10,6 +10,9 @@ const RoutineList: React.FC = () => {
   const navigate = useNavigate();
   const { routines, addRoutine } = useRoutines();
 
+  // Filter out routines without names
+  const validRoutines = routines.filter((routine) => routine.name.trim());
+
   const getGreeting = () => {
     const now = new Date();
     const hours = now.getHours();
@@ -28,7 +31,7 @@ const RoutineList: React.FC = () => {
 
   const handleAddRoutine = () => {
     const newRoutine = addRoutine({
-      name: "New Routine",
+      name: "",
       stretches: [
         {
           id: crypto.randomUUID(),
@@ -65,7 +68,7 @@ const RoutineList: React.FC = () => {
             />
           </div>
 
-          {routines.length === 0 ? (
+          {validRoutines.length === 0 ? (
             <div className="text-center py-20 bg-[var(--color-bg-layer)] border border-dashed rounded-3xl border-[var(--color-border-default)]">
               <p className="text-[var(--color-fg-muted)] mb-4">
                 No routines yet. Create your first routine to get started!
@@ -79,7 +82,7 @@ const RoutineList: React.FC = () => {
             </div>
           ) : (
             <div className="flex flex-col gap-2">
-              {routines.map((routine, index) => (
+              {validRoutines.map((routine, index) => (
                 <div
                   key={routine.id}
                   style={{

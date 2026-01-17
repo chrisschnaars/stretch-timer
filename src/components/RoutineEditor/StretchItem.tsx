@@ -18,7 +18,6 @@ export interface StretchItemProps {
   removeStretch?: (id: string) => void;
   startEditing?: (stretch: Stretch) => void;
   dragHandleProps?: React.HTMLAttributes<HTMLButtonElement>;
-  isOnlyStretch?: boolean;
 }
 
 export const StretchItem: React.FC<StretchItemProps> = ({
@@ -33,7 +32,6 @@ export const StretchItem: React.FC<StretchItemProps> = ({
   removeStretch,
   startEditing,
   dragHandleProps,
-  isOnlyStretch,
 }) => {
   return (
     <div
@@ -71,7 +69,6 @@ export const StretchItem: React.FC<StretchItemProps> = ({
               icon={Trash2}
               size="sm"
               destructive
-              disabled={isOnlyStretch}
             />
           </div>
         </div>
@@ -118,7 +115,6 @@ export interface SortableStretchProps {
   cancelEdit: () => void;
   removeStretch: (id: string) => void;
   startEditing: (stretch: Stretch) => void;
-  isOnlyStretch: boolean;
 }
 
 export const SortableStretch: React.FC<SortableStretchProps> = (props) => {

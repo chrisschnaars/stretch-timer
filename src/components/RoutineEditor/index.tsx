@@ -60,7 +60,7 @@ const RoutineEditor: React.FC = () => {
   );
 
   // If routine doesn't exist, redirect to home
-  if (!id || !name) {
+  if (!id) {
     return <Navigate to="/" replace />;
   }
 
@@ -163,6 +163,7 @@ const RoutineEditor: React.FC = () => {
               label="Routine Name"
               value={name}
               onChange={(e) => updateName(e.target.value)}
+              required
             />
 
             <SliderInput
@@ -228,7 +229,6 @@ const RoutineEditor: React.FC = () => {
                       cancelEdit={cancelEdit}
                       removeStretch={removeStretch}
                       startEditing={startEditing}
-                      isOnlyStretch={stretches.length === 1}
                     />
                   ))}
                 </div>

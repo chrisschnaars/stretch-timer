@@ -160,8 +160,8 @@ const TimerView: React.FC = () => {
     }
   }, [timerState, countdown, playCountdownTick]);
 
-  // If routine doesn't exist, redirect to home
-  if (!id || (!currentStretch && !isFinished)) {
+  // If routine doesn't exist or has no name, redirect to home
+  if (!id || !routine.name || (!currentStretch && !isFinished)) {
     return <Navigate to="/" replace />;
   }
 
