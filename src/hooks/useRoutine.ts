@@ -36,6 +36,7 @@ export const useRoutine = (routineId: string) => {
       updateDuration: () => {},
       updateRestDuration: () => {},
       updateName: () => {},
+      initAudio: () => {},
       setCurrentIndex: () => {},
     };
   }
@@ -210,6 +211,21 @@ export const useRoutine = (routineId: string) => {
     };
   }, [isRunning, timeLeft, nextStretch, playBeep]);
 
+  // Initialize AudioContext for mobile compatibility
+  const initAudio = useCallback(() => {
+    if (!audioCtxRef.current) {
+      const AudioContextClass =
+        window.AudioContext ||
+        (window as typeof window & { webkitAudioContext: typeof AudioContext })
+          .webkitAudioContext;
+      audioCtxRef.current = new AudioContextClass();
+    }
+
+    if (audioCtxRef.current.state === "suspended") {
+      audioCtxRef.current.resume();
+    }
+  }, []);
+
   return {
     name,
     stretches,
@@ -230,6 +246,7 @@ export const useRoutine = (routineId: string) => {
     updateDuration,
     updateRestDuration,
     updateName,
+    initAudio,
     setCurrentIndex: (idx: number) => {
       setCurrentIndex(idx);
       setIsResting(false);

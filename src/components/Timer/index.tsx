@@ -32,6 +32,7 @@ const TimerView: React.FC = () => {
     resetTimer,
     toggleTimer,
     isRunning,
+    initAudio,
   } = routine;
 
   const playBeep = useCallback(() => {
@@ -166,6 +167,23 @@ const TimerView: React.FC = () => {
   }
 
   const handleStart = () => {
+    // Initialize AudioContext on user interaction for mobile compatibility
+    if (!audioCtxRef.current) {
+      const AudioContextClass =
+        window.AudioContext ||
+        (window as typeof window & { webkitAudioContext: typeof AudioContext })
+          .webkitAudioContext;
+      audioCtxRef.current = new AudioContextClass();
+    }
+
+    // Resume AudioContext if suspended (required for iOS)
+    if (audioCtxRef.current.state === "suspended") {
+      audioCtxRef.current.resume();
+    }
+
+    // Also initialize the audio context in useRoutine for stretch completion sounds
+    initAudio();
+
     setTimerState("countdown");
     setIsCountdownRunning(true);
   };
