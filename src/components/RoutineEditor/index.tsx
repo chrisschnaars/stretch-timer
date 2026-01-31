@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, Navigate } from "react-router-dom";
 import { useRoutine } from "../../hooks/useRoutine";
 import { useRoutines } from "../../hooks/useRoutines";
@@ -30,7 +30,7 @@ import { StretchItem, SortableStretch } from "./StretchItem";
 const RoutineEditor: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { deleteRoutine } = useRoutines();
+  const { deleteRoutine, getRoutine } = useRoutines();
   const routine = useRoutine(id!);
 
   const {
@@ -48,6 +48,10 @@ const RoutineEditor: React.FC = () => {
   const [editName, setEditName] = useState("");
   const [activeId, setActiveId] = useState<string | null>(null);
 
+  // Check if this is a new routine (hasn't been fully saved yet)
+  const isNewRoutine = !name.trim();
+  const storedRoutine = getRoutine(id!);
+
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -59,6 +63,21 @@ const RoutineEditor: React.FC = () => {
     })
   );
 
+  // Auto-edit the first stretch if it's a new routine with an empty stretch
+  useEffect(() => {
+    if (
+      isNewRoutine &&
+      stretches.length > 0 &&
+      !stretches[0].name.trim() &&
+      !editingId
+    ) {
+      setTimeout(() => {
+        setEditingId(stretches[0].id);
+        setEditName(stretches[0].name);
+      }, 0);
+    }
+  }, [isNewRoutine, stretches, editingId]);
+
   // If routine doesn't exist, redirect to home
   if (!id) {
     return <Navigate to="/" replace />;
@@ -69,6 +88,21 @@ const RoutineEditor: React.FC = () => {
       deleteRoutine(id);
       navigate("/");
     }
+  };
+
+  const handleSave = () => {
+    if (!name.trim()) {
+      alert("Please enter a routine name before saving.");
+      return;
+    }
+    navigate("/");
+  };
+
+  const handleCancel = () => {
+    if (storedRoutine) {
+      deleteRoutine(id);
+    }
+    navigate("/");
   };
 
   const startEditing = (stretch: Stretch) => {
@@ -146,12 +180,14 @@ const RoutineEditor: React.FC = () => {
     <div className="min-h-screen bg-[var(--color-bg-primary)] text-[var(--color-fg-primary)] font-sans p-4 flex flex-col items-center">
       <header className="w-full max-w-md flex justify-between items-center mb-8 pt-2">
         <Button
-          onClick={() => navigate(-1)}
+          onClick={isNewRoutine ? handleCancel : () => navigate(-1)}
           icon={ArrowLeft}
           size="sm"
           aria-label="Back"
         />
-        <h1 className="text-xl font-bold tracking-tight">Edit Routine</h1>
+        <h1 className="text-xl font-bold tracking-tight">
+          {isNewRoutine ? "Create Routine" : "Edit Routine"}
+        </h1>
         <span className="w-8"></span>
       </header>
 
@@ -164,6 +200,7 @@ const RoutineEditor: React.FC = () => {
               value={name}
               onChange={(e) => updateName(e.target.value)}
               required
+              autoFocus={isNewRoutine}
             />
 
             <SliderInput
@@ -187,7 +224,7 @@ const RoutineEditor: React.FC = () => {
 
         <div className="space-y-2">
           <div className="flex justify-between items-center">
-            <h2 className="heading-md">Routine</h2>
+            <h2 className="heading-md">Activities</h2>
             <Button
               onClick={addStretch}
               icon={Plus}
@@ -242,18 +279,34 @@ const RoutineEditor: React.FC = () => {
           )}
         </div>
 
-        <div>
-          <h2 className="heading-md mb-4">Feeling unmotivated?</h2>
-          <Button
-            className="w-full border-1 border-red-300"
-            onClick={handleDelete}
-            icon={Trash2}
-            size="md"
-            destructive
-          >
-            Delete Routine
-          </Button>
-        </div>
+        {isNewRoutine ? (
+          <div className="flex gap-2">
+            <Button
+              className="flex-1"
+              onClick={handleSave}
+              size="md"
+              kind="primary"
+            >
+              Save Routine
+            </Button>
+            <Button className="flex-1" onClick={handleCancel} size="md">
+              Cancel
+            </Button>
+          </div>
+        ) : (
+          <div>
+            <h2 className="heading-md mb-4">Feeling unmotivated?</h2>
+            <Button
+              className="w-full border-1 border-red-300"
+              onClick={handleDelete}
+              icon={Trash2}
+              size="md"
+              destructive
+            >
+              Delete Routine
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );

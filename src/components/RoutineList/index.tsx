@@ -35,7 +35,7 @@ const RoutineList: React.FC = () => {
       stretches: [
         {
           id: crypto.randomUUID(),
-          name: "Jumping Jacks",
+          name: "",
         },
       ],
       duration: DEFAULT_DURATION,

@@ -50,10 +50,12 @@ export const StretchItem: React.FC<StretchItemProps> = ({
             onKeyDown={(e) => {
               if (e.key === "Enter" && editName?.trim()) {
                 saveEdit?.();
+              } else if (e.key === "Escape") {
+                cancelEdit?.();
               }
             }}
             className="bg-transparent"
-            autoFocus
+            placeholder="Enter activity name"
           />
           <div className="flex justify-between gap-2 items-center">
             <div className="flex justify-end gap-2 pt-2">
