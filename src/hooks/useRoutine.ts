@@ -148,7 +148,7 @@ export const useRoutine = (routineId: string) => {
     updateRoutineInStorage(routineId, { name: newName });
   };
 
-  const playBeep = useCallback(() => {
+  const playBeep = useCallback(async () => {
     if (!audioCtxRef.current) {
       console.log("useRoutine: AudioContext not initialized, creating now...");
       const AudioContextClass =
@@ -163,9 +163,16 @@ export const useRoutine = (routineId: string) => {
 
     if (ctx.state === "suspended") {
       console.log("useRoutine: Resuming suspended AudioContext...");
-      ctx.resume();
+      try {
+        await ctx.resume();
+        console.log("useRoutine: AudioContext resumed successfully, new state:", ctx.state);
+      } catch (error) {
+        console.error("useRoutine: Failed to resume AudioContext:", error);
+        return;
+      }
     }
 
+    console.log("useRoutine: Playing beep sound...");
     const now = ctx.currentTime;
 
     // Create a gentle bell/chime with harmonics
@@ -180,7 +187,7 @@ export const useRoutine = (routineId: string) => {
 
       // Stagger the notes slightly for a more musical effect
       const startTime = now + i * 0.05;
-      const volume = 0.15 - i * 0.03; // Decreasing volume for each harmonic
+      const volume = 0.3 - i * 0.05; // Decreasing volume for each harmonic (increased for mobile)
 
       gainNode.gain.setValueAtTime(0, startTime);
       gainNode.gain.linearRampToValueAtTime(volume, startTime + 0.02);

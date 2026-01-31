@@ -35,7 +35,7 @@ const TimerView: React.FC = () => {
     initAudio,
   } = routine;
 
-  const playBeep = useCallback(() => {
+  const playBeep = useCallback(async () => {
     if (!audioCtxRef.current) {
       console.log("AudioContext not initialized, creating now...");
       const AudioContextClass =
@@ -50,9 +50,16 @@ const TimerView: React.FC = () => {
 
     if (ctx.state === "suspended") {
       console.log("Resuming suspended AudioContext...");
-      ctx.resume();
+      try {
+        await ctx.resume();
+        console.log("AudioContext resumed successfully, new state:", ctx.state);
+      } catch (error) {
+        console.error("Failed to resume AudioContext:", error);
+        return;
+      }
     }
 
+    console.log("Playing beep sound...");
     const now = ctx.currentTime;
 
     // Create a gentle bell/chime with harmonics
@@ -67,7 +74,7 @@ const TimerView: React.FC = () => {
 
       // Stagger the notes slightly for a more musical effect
       const startTime = now + i * 0.05;
-      const volume = 0.15 - i * 0.03; // Decreasing volume for each harmonic
+      const volume = 0.3 - i * 0.05; // Decreasing volume for each harmonic (increased for mobile)
 
       gainNode.gain.setValueAtTime(0, startTime);
       gainNode.gain.linearRampToValueAtTime(volume, startTime + 0.02);
@@ -81,7 +88,7 @@ const TimerView: React.FC = () => {
     });
   }, []);
 
-  const playCountdownTick = useCallback(() => {
+  const playCountdownTick = useCallback(async () => {
     if (!audioCtxRef.current) {
       console.log("Countdown: AudioContext not initialized, creating now...");
       const AudioContextClass =
@@ -96,9 +103,16 @@ const TimerView: React.FC = () => {
 
     if (ctx.state === "suspended") {
       console.log("Countdown: Resuming suspended AudioContext...");
-      ctx.resume();
+      try {
+        await ctx.resume();
+        console.log("Countdown: AudioContext resumed successfully, new state:", ctx.state);
+      } catch (error) {
+        console.error("Countdown: Failed to resume AudioContext:", error);
+        return;
+      }
     }
 
+    console.log("Playing countdown tick...");
     const now = ctx.currentTime;
 
     // Create a short, gentle tick sound
@@ -109,7 +123,7 @@ const TimerView: React.FC = () => {
     oscillator.frequency.setValueAtTime(440, now); // A4 - lower, mellower tone
 
     gainNode.gain.setValueAtTime(0, now);
-    gainNode.gain.linearRampToValueAtTime(0.08, now + 0.02); // Softer and slower attack
+    gainNode.gain.linearRampToValueAtTime(0.2, now + 0.02); // Increased volume for mobile
     gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
 
     oscillator.connect(gainNode);
