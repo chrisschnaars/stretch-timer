@@ -47,6 +47,11 @@ export const StretchItem: React.FC<StretchItemProps> = ({
             label="Name"
             value={editName}
             onChange={(e) => setEditName?.(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && editName?.trim()) {
+                saveEdit?.();
+              }
+            }}
             className="bg-transparent"
             autoFocus
           />
