@@ -173,6 +173,12 @@ export const useRoutine = (routineId: string) => {
     }
 
     console.log("useRoutine: Playing beep sound...");
+
+    // Vibrate to complement the sound (works in silent mode)
+    if (navigator.vibrate) {
+      navigator.vibrate([100, 50, 100, 50, 200]); // Pattern matching the bell chime
+    }
+
     const now = ctx.currentTime;
 
     // Create a gentle bell/chime with harmonics

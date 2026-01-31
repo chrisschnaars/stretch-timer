@@ -60,6 +60,12 @@ const TimerView: React.FC = () => {
     }
 
     console.log("Playing beep sound...");
+
+    // Vibrate to complement the sound (works in silent mode)
+    if (navigator.vibrate) {
+      navigator.vibrate([100, 50, 100, 50, 200]); // Pattern matching the bell chime
+    }
+
     const now = ctx.currentTime;
 
     // Create a gentle bell/chime with harmonics
@@ -113,6 +119,12 @@ const TimerView: React.FC = () => {
     }
 
     console.log("Playing countdown tick...");
+
+    // Short vibration for countdown tick (works in silent mode)
+    if (navigator.vibrate) {
+      navigator.vibrate(50); // Quick 50ms vibration
+    }
+
     const now = ctx.currentTime;
 
     // Create a short, gentle tick sound
