@@ -150,6 +150,7 @@ export const useRoutine = (routineId: string) => {
 
   const playBeep = useCallback(() => {
     if (!audioCtxRef.current) {
+      console.log("useRoutine: AudioContext not initialized, creating now...");
       const AudioContextClass =
         window.AudioContext ||
         (window as typeof window & { webkitAudioContext: typeof AudioContext })
@@ -158,8 +159,10 @@ export const useRoutine = (routineId: string) => {
     }
 
     const ctx = audioCtxRef.current;
+    console.log("useRoutine: AudioContext state:", ctx.state);
 
     if (ctx.state === "suspended") {
+      console.log("useRoutine: Resuming suspended AudioContext...");
       ctx.resume();
     }
 
@@ -212,7 +215,7 @@ export const useRoutine = (routineId: string) => {
   }, [isRunning, timeLeft, nextStretch, playBeep]);
 
   // Initialize AudioContext for mobile compatibility
-  const initAudio = useCallback(() => {
+  const initAudio = useCallback(async () => {
     if (!audioCtxRef.current) {
       const AudioContextClass =
         window.AudioContext ||
@@ -222,7 +225,24 @@ export const useRoutine = (routineId: string) => {
     }
 
     if (audioCtxRef.current.state === "suspended") {
-      audioCtxRef.current.resume();
+      try {
+        await audioCtxRef.current.resume();
+      } catch (error) {
+        console.error("Failed to resume AudioContext:", error);
+      }
+    }
+
+    // Play a silent sound to "unlock" audio on iOS
+    try {
+      const oscillator = audioCtxRef.current.createOscillator();
+      const gainNode = audioCtxRef.current.createGain();
+      gainNode.gain.value = 0; // Silent
+      oscillator.connect(gainNode);
+      gainNode.connect(audioCtxRef.current.destination);
+      oscillator.start();
+      oscillator.stop(audioCtxRef.current.currentTime + 0.001);
+    } catch (error) {
+      console.error("Failed to unlock audio:", error);
     }
   }, []);
 

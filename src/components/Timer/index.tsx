@@ -37,6 +37,7 @@ const TimerView: React.FC = () => {
 
   const playBeep = useCallback(() => {
     if (!audioCtxRef.current) {
+      console.log("AudioContext not initialized, creating now...");
       const AudioContextClass =
         window.AudioContext ||
         (window as typeof window & { webkitAudioContext: typeof AudioContext })
@@ -45,8 +46,10 @@ const TimerView: React.FC = () => {
     }
 
     const ctx = audioCtxRef.current;
+    console.log("AudioContext state:", ctx.state);
 
     if (ctx.state === "suspended") {
+      console.log("Resuming suspended AudioContext...");
       ctx.resume();
     }
 
@@ -80,6 +83,7 @@ const TimerView: React.FC = () => {
 
   const playCountdownTick = useCallback(() => {
     if (!audioCtxRef.current) {
+      console.log("Countdown: AudioContext not initialized, creating now...");
       const AudioContextClass =
         window.AudioContext ||
         (window as typeof window & { webkitAudioContext: typeof AudioContext })
@@ -88,8 +92,10 @@ const TimerView: React.FC = () => {
     }
 
     const ctx = audioCtxRef.current;
+    console.log("Countdown: AudioContext state:", ctx.state);
 
     if (ctx.state === "suspended") {
+      console.log("Countdown: Resuming suspended AudioContext...");
       ctx.resume();
     }
 
@@ -166,23 +172,50 @@ const TimerView: React.FC = () => {
     return <Navigate to="/" replace />;
   }
 
-  const handleStart = () => {
+  const handleStart = async () => {
+    console.log("🎵 Initializing audio on user interaction...");
+
     // Initialize AudioContext on user interaction for mobile compatibility
     if (!audioCtxRef.current) {
+      console.log("Creating AudioContext for countdown sounds...");
       const AudioContextClass =
         window.AudioContext ||
         (window as typeof window & { webkitAudioContext: typeof AudioContext })
           .webkitAudioContext;
       audioCtxRef.current = new AudioContextClass();
+      console.log("AudioContext created, state:", audioCtxRef.current.state);
     }
 
     // Resume AudioContext if suspended (required for iOS)
     if (audioCtxRef.current.state === "suspended") {
-      audioCtxRef.current.resume();
+      console.log("Resuming suspended AudioContext...");
+      try {
+        await audioCtxRef.current.resume();
+        console.log("AudioContext resumed, new state:", audioCtxRef.current.state);
+      } catch (error) {
+        console.error("Failed to resume AudioContext:", error);
+      }
+    }
+
+    // Play a silent sound to "unlock" audio on iOS
+    try {
+      console.log("Playing silent sound to unlock audio...");
+      const oscillator = audioCtxRef.current.createOscillator();
+      const gainNode = audioCtxRef.current.createGain();
+      gainNode.gain.value = 0; // Silent
+      oscillator.connect(gainNode);
+      gainNode.connect(audioCtxRef.current.destination);
+      oscillator.start();
+      oscillator.stop(audioCtxRef.current.currentTime + 0.001);
+      console.log("Silent sound played successfully");
+    } catch (error) {
+      console.error("Failed to unlock audio:", error);
     }
 
     // Also initialize the audio context in useRoutine for stretch completion sounds
-    initAudio();
+    console.log("Initializing useRoutine audio...");
+    await initAudio();
+    console.log("✅ Audio initialization complete");
 
     setTimerState("countdown");
     setIsCountdownRunning(true);
